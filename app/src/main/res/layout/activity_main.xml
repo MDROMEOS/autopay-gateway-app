@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F6FA"
+    android:padding="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Payment Gateway Controller"
+            android:textColor="#2D3436"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_gravity="center"
+            android:layout_marginBottom="20dp"/>
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="গেটওয়ে সার্ভার URL:"/>
+        <EditText
+            android:id="@+id/etServerUrl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:padding="12dp"
+            android:layout_marginBottom="15dp"
+            android:textSize="14sp"/>
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="মার্চেন্ট API Key:"/>
+        <EditText
+            android:id="@+id/etApiKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:padding="12dp"
+            android:hint="যেমন: KEY_XXXXXX বা MRTS"
+            android:layout_marginBottom="15dp"
+            android:textSize="14sp"/>
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="পার্সোনাল নম্বর (বিকাশ ও নগদ উভয়ের জন্য):"/>
+        <EditText
+            android:id="@+id/etBkashNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:inputType="phone"
+            android:padding="12dp"
+            android:hint="01XXXXXXXXX"
+            android:layout_marginBottom="15dp"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#FFFFFF"
+            android:padding="15dp"
+            android:elevation="2dp"
+            android:layout_marginBottom="15dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="পেমেন্ট চ্যানেল চালু/বন্ধ নিয়ন্ত্রণ:"
+                android:textStyle="bold"
+                android:textColor="#636E72"
+                android:layout_marginBottom="10dp"/>
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchBkash"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🌸 bKash (বিকাশ চ্যানেল)"
+                android:checked="true"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#E2136E"
+                android:paddingBottom="8dp"/>
+
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEEEEE" android:layout_marginBottom="8dp"/>
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchNagad"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🔶 Nagad (নগদ চ্যানেল)"
+                android:checked="true"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#F37023"
+                android:paddingBottom="8dp"/>
+
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEEEEE" android:layout_marginBottom="8dp"/>
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchBanglaQr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🔰 Bangla QR (বাংলা কিউআর চ্যানেল)"
+                android:checked="false"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#0984E3"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#FFFFFF"
+            android:padding="15dp"
+            android:elevation="2dp"
+            android:layout_marginBottom="15dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="বাংলা কিউআর ছবি ব্যবস্থাপনা:"
+                android:textStyle="bold"
+                android:textColor="#2D3436"
+                android:layout_marginBottom="8dp"/>
+
+            <TextView
+                android:id="@+id/tvQrStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ছবি স্ট্যাটাস: কোনো ছবি সেট করা নেই"
+                android:textColor="#7F8C8D"
+                android:textSize="13sp"
+                android:layout_marginBottom="12dp"/>
+
+            <Button
+                android:id="@+id/btnUploadQr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="📷 গ্যালারি থেকে অরিজিনাল কিউআর ছবি আপলোড"
+                android:backgroundTint="#0984E3"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:padding="12dp"/>
+
+            <Button
+                android:id="@+id/btnClearQr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🗑️ ছবি মুছে ফেলুন (Clear)"
+                android:backgroundTint="#E74C3C"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="8dp"
+                android:padding="10dp"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnConnect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="সেভ ও কানেক্ট করুন"
+            android:backgroundTint="#2D3436"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:padding="14dp"/>
+
+        <Button
+            android:id="@+id/btnNotifAccess"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🔔 নোটিফিকেশন এক্সেস দিন"
+            android:backgroundTint="#3498DB"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:layout_marginTop="10dp"
+            android:padding="12dp"/>
+
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#DDDDDD" android:layout_marginTop="20dp" android:layout_marginBottom="20dp"/>
+
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="সার্ভিস স্ট্যাটাস: বন্ধ আছে"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#E74C3C"
+            android:layout_gravity="center"
+            android:layout_marginBottom="15dp"/>
+
+        <Button
+            android:id="@+id/btnToggleService"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="সার্ভিস চালু করুন"
+            android:backgroundTint="#27AE60"
+            android:textColor="#FFFFFF"
+            android:padding="14dp"/>
+
+    </LinearLayout>
+</ScrollView>

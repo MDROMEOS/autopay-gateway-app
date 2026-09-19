@@ -1,0 +1,21 @@
+plugins { id 'com.android.application' }
+android {
+    namespace 'com.gateway.autopay'
+    compileSdk 34
+    defaultConfig {
+        applicationId "com.gateway.autopay"
+        minSdk 21
+        targetSdk 34
+        versionCode 17
+        versionName "2.6"
+    }
+    buildTypes { release { minifyEnabled false } }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+}
