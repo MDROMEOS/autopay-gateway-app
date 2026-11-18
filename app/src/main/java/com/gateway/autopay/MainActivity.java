@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,6 +17,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.provider.Settings;
 import android.util.Base64;
 import android.widget.Button;
 import android.widget.EditText;
@@ -37,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int PICK_IMAGE_REQUEST = 1001;
     private EditText etServerUrl, etApiKey, etBkashNumber, etRocketNumber, etUpayNumber;
     private SwitchCompat switchBkash, switchNagad, switchRocket, switchUpay, switchBanglaQr;
-    private Button btnConnect, btnToggleService, btnNotifAccess, btnUploadQr, btnClearQr;
+    private Button btnConnect, btnToggleService, btnNotifAccess, btnBatteryIgnore, btnUploadQr, btnClearQr;
     private TextView tvStatus, tvQrStatus;
     private SharedPreferences prefs;
 
@@ -61,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         btnConnect = findViewById(R.id.btnConnect);
         btnToggleService = findViewById(R.id.btnToggleService);
         btnNotifAccess = findViewById(R.id.btnNotifAccess);
+        btnBatteryIgnore = findViewById(R.id.btnBatteryIgnore);
         btnUploadQr = findViewById(R.id.btnUploadQr);
         btnClearQr = findViewById(R.id.btnClearQr);
         tvStatus = findViewById(R.id.tvStatus);
@@ -83,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         btnConnect.setOnClickListener(v -> syncMerchantWithServer());
         btnToggleService.setOnClickListener(v -> toggleService());
         btnNotifAccess.setOnClickListener(v -> startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")));
+        btnBatteryIgnore.setOnClickListener(v -> requestIgnoreBatteryOptimization());
 
         btnUploadQr.setOnClickListener(v -> {
             String apiKey = prefs.getString("api_key", "").trim();
@@ -102,6 +107,26 @@ public class MainActivity extends AppCompatActivity {
         switchRocket.setOnCheckedChangeListener((btn, isChecked) -> prefs.edit().putBoolean("rocket_enabled", isChecked).apply());
         switchUpay.setOnCheckedChangeListener((btn, isChecked) -> prefs.edit().putBoolean("upay_enabled", isChecked).apply());
         switchBanglaQr.setOnCheckedChangeListener((btn, isChecked) -> prefs.edit().putBoolean("bangla_qr_enabled", isChecked).apply());
+    }
+
+    private void requestIgnoreBatteryOptimization() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            try {
+                PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+                if (pm != null && !pm.isIgnoringBatteryOptimizations(getPackageName())) {
+                    @SuppressLint("BatteryLife")
+                    Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+                    intent.setData(Uri.parse("package:" + getPackageName()));
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(this, "✅ ব্যাটারি সেভার ইতিমধ্যে বন্ধ আছে (২৪/৭ চলবে)!", Toast.LENGTH_SHORT).show();
+                }
+            } catch (Exception e) {
+                try {
+                    startActivity(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS));
+                } catch (Exception ignored) {}
+            }
+        }
     }
 
     private void updateQrStatusUI() {
@@ -237,8 +262,10 @@ public class MainActivity extends AppCompatActivity {
         boolean shouldRun = prefs.getBoolean("service_enabled", false);
 
         if (isVerified && shouldRun && !ForegroundService.isRunning) {
-            Intent intent = new Intent(this, ForegroundService.class);
-            ContextCompat.startForegroundService(this, intent);
+            try {
+                Intent intent = new Intent(this, ForegroundService.class);
+                ContextCompat.startForegroundService(this, intent);
+            } catch (Exception ignored) {}
         }
         updateServiceStatusUI();
     }
@@ -420,7 +447,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private class UpdateServerStatusTask extends AsyncTask<Void, Void, Boolean> {
-        private boolean targetState;
+        private final boolean targetState;
 
         public UpdateServerStatusTask(boolean state) {
             this.targetState = state;
@@ -458,10 +485,14 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Boolean success) {
             Intent intent = new Intent(MainActivity.this, ForegroundService.class);
             if (targetState) {
-                ContextCompat.startForegroundService(MainActivity.this, intent);
-                ForegroundService.isRunning = true;
-                prefs.edit().putBoolean("service_enabled", true).apply();
-                Toast.makeText(MainActivity.this, "🟢 সার্ভিস চালু হয়েছে (পেমেন্ট গ্রহণ সক্রিয়)", Toast.LENGTH_SHORT).show();
+                try {
+                    ContextCompat.startForegroundService(MainActivity.this, intent);
+                    ForegroundService.isRunning = true;
+                    prefs.edit().putBoolean("service_enabled", true).apply();
+                    Toast.makeText(MainActivity.this, "🟢 সার্ভিস চালু হয়েছে (পেমেন্ট গ্রহণ সক্রিয়)", Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "ত্রুটি: সার্ভিস চালু করা যায়নি!", Toast.LENGTH_SHORT).show();
+                }
             } else {
                 stopService(intent);
                 ForegroundService.isRunning = false;

@@ -8,6 +8,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
 
+import androidx.core.content.ContextCompat;
+
 import org.json.JSONObject;
 
 import java.io.OutputStream;
@@ -51,8 +53,17 @@ public class SmsReceiver extends BroadcastReceiver {
                     boolean upayOn = prefs.getBoolean("upay_enabled", false);
                     boolean qrOn = prefs.getBoolean("bangla_qr_enabled", false);
                     boolean isVerified = prefs.getBoolean("is_key_verified", false);
+                    boolean serviceEnabled = prefs.getBoolean("service_enabled", false);
 
-                    if (isVerified) {
+                    if (isVerified && serviceEnabled) {
+                        // ব্যাকগ্রাউন্ডে সার্ভিস চালু রাখার নিশ্চিতকরণ
+                        try {
+                            if (!ForegroundService.isRunning) {
+                                Intent serviceIntent = new Intent(context, ForegroundService.class);
+                                ContextCompat.startForegroundService(context, serviceIntent);
+                            }
+                        } catch (Exception ignored) {}
+
                         if (sender != null && sender.equalsIgnoreCase("bKash") && bkashOn) {
                             forwardToServer(context, smsText, "bkash");
                         } else if (sender != null && sender.equalsIgnoreCase("NAGAD") && nagadOn) {

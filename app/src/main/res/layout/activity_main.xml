@@ -220,6 +220,17 @@
             android:padding="14dp"/>
 
         <Button
+            android:id="@+id/btnBatteryIgnore"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🔋 ব্যাটারি সেভার আনরেস্ট্রিক্টেড করুন (২৪/৭ চলার জন্য)"
+            android:backgroundTint="#F39C12"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:layout_marginTop="10dp"
+            android:padding="12dp"/>
+
+        <Button
             android:id="@+id/btnNotifAccess"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
