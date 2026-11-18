@@ -35,8 +35,8 @@ import java.net.URL;
 public class MainActivity extends AppCompatActivity {
 
     private static final int PICK_IMAGE_REQUEST = 1001;
-    private EditText etServerUrl, etApiKey, etBkashNumber;
-    private SwitchCompat switchBkash, switchNagad, switchBanglaQr;
+    private EditText etServerUrl, etApiKey, etBkashNumber, etRocketNumber, etUpayNumber;
+    private SwitchCompat switchBkash, switchNagad, switchRocket, switchUpay, switchBanglaQr;
     private Button btnConnect, btnToggleService, btnNotifAccess, btnUploadQr, btnClearQr;
     private TextView tvStatus, tvQrStatus;
     private SharedPreferences prefs;
@@ -51,8 +51,12 @@ public class MainActivity extends AppCompatActivity {
         etServerUrl = findViewById(R.id.etServerUrl);
         etApiKey = findViewById(R.id.etApiKey);
         etBkashNumber = findViewById(R.id.etBkashNumber);
+        etRocketNumber = findViewById(R.id.etRocketNumber);
+        etUpayNumber = findViewById(R.id.etUpayNumber);
         switchBkash = findViewById(R.id.switchBkash);
         switchNagad = findViewById(R.id.switchNagad);
+        switchRocket = findViewById(R.id.switchRocket);
+        switchUpay = findViewById(R.id.switchUpay);
         switchBanglaQr = findViewById(R.id.switchBanglaQr);
         btnConnect = findViewById(R.id.btnConnect);
         btnToggleService = findViewById(R.id.btnToggleService);
@@ -65,8 +69,12 @@ public class MainActivity extends AppCompatActivity {
         etServerUrl.setText(prefs.getString("server_url", "https://allgatewaypayment.bd-voter-cloud.workers.dev"));
         etApiKey.setText(prefs.getString("api_key", ""));
         etBkashNumber.setText(prefs.getString("bkash_number", ""));
+        etRocketNumber.setText(prefs.getString("rocket_number", ""));
+        etUpayNumber.setText(prefs.getString("upay_number", ""));
         switchBkash.setChecked(prefs.getBoolean("bkash_enabled", true));
         switchNagad.setChecked(prefs.getBoolean("nagad_enabled", true));
+        switchRocket.setChecked(prefs.getBoolean("rocket_enabled", false));
+        switchUpay.setChecked(prefs.getBoolean("upay_enabled", false));
         switchBanglaQr.setChecked(prefs.getBoolean("bangla_qr_enabled", false));
 
         updateQrStatusUI();
@@ -91,6 +99,8 @@ public class MainActivity extends AppCompatActivity {
 
         switchBkash.setOnCheckedChangeListener((btn, isChecked) -> prefs.edit().putBoolean("bkash_enabled", isChecked).apply());
         switchNagad.setOnCheckedChangeListener((btn, isChecked) -> prefs.edit().putBoolean("nagad_enabled", isChecked).apply());
+        switchRocket.setOnCheckedChangeListener((btn, isChecked) -> prefs.edit().putBoolean("rocket_enabled", isChecked).apply());
+        switchUpay.setOnCheckedChangeListener((btn, isChecked) -> prefs.edit().putBoolean("upay_enabled", isChecked).apply());
         switchBanglaQr.setOnCheckedChangeListener((btn, isChecked) -> prefs.edit().putBoolean("bangla_qr_enabled", isChecked).apply());
     }
 
@@ -123,7 +133,6 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            // কিউআর কোডের পিক্সেল অক্ষত রেখে ৬৫০x৬৫০ পারফেক্ট সাইজ (Lossless PNG)
             int maxDim = 650;
             int w = bitmap.getWidth();
             int h = bitmap.getHeight();
@@ -131,10 +140,9 @@ public class MainActivity extends AppCompatActivity {
                 float ratio = Math.min((float) maxDim / w, (float) maxDim / h);
                 w = Math.max(1, Math.round(w * ratio));
                 h = Math.max(1, Math.round(h * ratio));
-                bitmap = Bitmap.createScaledBitmap(bitmap, w, h, false); // false = sharp pixelated, কোনো ঘোলা হবে না
+                bitmap = Bitmap.createScaledBitmap(bitmap, w, h, false);
             }
 
-            // শতভাগ আসল ও স্পষ্ট রাখতে PNG ফরম্যাট (যাতে প্রতিটা ডট ১০০% পরিষ্কার থাকে)
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
             byte[] imageBytes = baos.toByteArray();
@@ -263,42 +271,65 @@ public class MainActivity extends AppCompatActivity {
         String server = etServerUrl.getText().toString().trim();
         String apiKey = etApiKey.getText().toString().trim();
         String number = etBkashNumber.getText().toString().trim();
+        String rocketNum = etRocketNumber.getText().toString().trim();
+        String upayNum = etUpayNumber.getText().toString().trim();
 
         if (apiKey.isEmpty() || number.isEmpty()) {
-            Toast.makeText(this, "⚠️ API Key এবং মোবাইল নম্বর লিখুন!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "⚠️ API Key এবং মূল মোবাইল নম্বর লিখুন!", Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (number.length() != 11 || !number.startsWith("01")) {
-            Toast.makeText(this, "⚠️ সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "⚠️ সঠিক ১১ ডিজিটের মূল মোবাইল নম্বর দিন!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!rocketNum.isEmpty() && ((rocketNum.length() != 11 && rocketNum.length() != 12) || !rocketNum.startsWith("01"))) {
+            Toast.makeText(this, "⚠️ রকেট নম্বর সঠিক ১১ বা ১২ ডিজিটের দিন!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!upayNum.isEmpty() && (upayNum.length() != 11 || !upayNum.startsWith("01"))) {
+            Toast.makeText(this, "⚠️ উপায় নম্বর সঠিক ১১ ডিজিটের দিন!", Toast.LENGTH_SHORT).show();
             return;
         }
 
         Toast.makeText(this, "⏳ সার্ভারের সাথে যাচাই করা হচ্ছে...", Toast.LENGTH_SHORT).show();
-        new SyncTask().execute(
+        new SyncTask(
             server,
             apiKey,
             number,
-            String.valueOf(switchBkash.isChecked()),
-            String.valueOf(switchNagad.isChecked()),
-            String.valueOf(switchBanglaQr.isChecked())
-        );
+            rocketNum,
+            upayNum,
+            switchBkash.isChecked(),
+            switchNagad.isChecked(),
+            switchRocket.isChecked(),
+            switchUpay.isChecked(),
+            switchBanglaQr.isChecked()
+        ).execute();
     }
 
-    private class SyncTask extends AsyncTask<String, Void, Integer> {
-        private String server, apiKey, number;
-        private boolean bkashOn, nagadOn, banglaQrOn;
+    private class SyncTask extends AsyncTask<Void, Void, Integer> {
+        private final String server, apiKey, number, rocketNum, upayNum;
+        private final boolean bkashOn, nagadOn, rocketOn, upayOn, banglaQrOn;
         private boolean serverHasQr = false;
 
-        @Override
-        protected Integer doInBackground(String... params) {
-            server = params[0];
-            apiKey = params[1];
-            number = params[2];
-            bkashOn = Boolean.parseBoolean(params[3]);
-            nagadOn = Boolean.parseBoolean(params[4]);
-            banglaQrOn = Boolean.parseBoolean(params[5]);
+        public SyncTask(String server, String apiKey, String number, String rocketNum, String upayNum,
+                        boolean bkashOn, boolean nagadOn, boolean rocketOn, boolean upayOn, boolean banglaQrOn) {
+            this.server = server;
+            this.apiKey = apiKey;
+            this.number = number;
+            this.rocketNum = rocketNum;
+            this.upayNum = upayNum;
+            this.bkashOn = bkashOn;
+            this.nagadOn = nagadOn;
+            this.rocketOn = rocketOn;
+            this.upayOn = upayOn;
+            this.banglaQrOn = banglaQrOn;
+        }
 
+        @Override
+        protected Integer doInBackground(Void... voids) {
             try {
                 String cleanUrl = server.replaceAll("/+$", "");
                 URL url = new URL(cleanUrl + "/api/v1/app/connect");
@@ -312,8 +343,12 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject json = new JSONObject();
                 json.put("api_key", apiKey);
                 json.put("bkash_number", number);
+                json.put("rocket_number", rocketNum);
+                json.put("upay_number", upayNum);
                 json.put("bkash_enabled", bkashOn);
                 json.put("nagad_enabled", nagadOn);
+                json.put("rocket_enabled", rocketOn);
+                json.put("upay_enabled", upayOn);
                 json.put("bangla_qr_enabled", banglaQrOn);
 
                 OutputStream os = conn.getOutputStream();
@@ -346,8 +381,12 @@ public class MainActivity extends AppCompatActivity {
                     .putString("server_url", server)
                     .putString("api_key", apiKey)
                     .putString("bkash_number", number)
+                    .putString("rocket_number", rocketNum)
+                    .putString("upay_number", upayNum)
                     .putBoolean("bkash_enabled", bkashOn)
                     .putBoolean("nagad_enabled", nagadOn)
+                    .putBoolean("rocket_enabled", rocketOn)
+                    .putBoolean("upay_enabled", upayOn)
                     .putBoolean("bangla_qr_enabled", banglaQrOn)
                     .putBoolean("has_qr_image", serverHasQr)
                     .putBoolean("is_key_verified", true)

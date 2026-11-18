@@ -37,7 +37,7 @@ public class ForegroundService extends Service {
         isRunning = true;
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Payment Gateway Active")
-                .setContentText("বিকাশ, নগদ ও বাংলা কিউআর সার্ভিস চালু আছে...")
+                .setContentText("বিকাশ, নগদ, রকেট, উপায় ও বাংলা QR সার্ভিস চালু আছে...")
                 .setSmallIcon(android.R.drawable.stat_notify_sync)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setOngoing(true)

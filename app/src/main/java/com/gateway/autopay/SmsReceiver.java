@@ -47,6 +47,8 @@ public class SmsReceiver extends BroadcastReceiver {
                     SharedPreferences prefs = context.getSharedPreferences("GatewayPrefs", Context.MODE_PRIVATE);
                     boolean bkashOn = prefs.getBoolean("bkash_enabled", true);
                     boolean nagadOn = prefs.getBoolean("nagad_enabled", true);
+                    boolean rocketOn = prefs.getBoolean("rocket_enabled", false);
+                    boolean upayOn = prefs.getBoolean("upay_enabled", false);
                     boolean qrOn = prefs.getBoolean("bangla_qr_enabled", false);
                     boolean isVerified = prefs.getBoolean("is_key_verified", false);
 
@@ -55,6 +57,10 @@ public class SmsReceiver extends BroadcastReceiver {
                             forwardToServer(context, smsText, "bkash");
                         } else if (sender != null && sender.equalsIgnoreCase("NAGAD") && nagadOn) {
                             forwardToServer(context, smsText, "nagad");
+                        } else if (rocketOn && sender != null && (sender.equalsIgnoreCase("16216") || sender.toLowerCase().contains("rocket"))) {
+                            forwardToServer(context, smsText, "rocket");
+                        } else if (upayOn && sender != null && (sender.equalsIgnoreCase("upay") || sender.toLowerCase().contains("upay"))) {
+                            forwardToServer(context, smsText, "upay");
                         } else if (qrOn && (
                                 (sender != null && (sender.equalsIgnoreCase("TallyPay") || sender.toLowerCase().contains("tallypay"))) ||
                                 smsText.contains("TallyPay QR payment") ||

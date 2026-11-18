@@ -41,7 +41,7 @@
             android:layout_marginBottom="15dp"
             android:textSize="14sp"/>
 
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="পার্সোনাল নম্বর (বিকাশ ও নগদ উভয়ের জন্য):"/>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="পার্সোনাল নম্বর (বিকাশ ও নগদের জন্য):"/>
         <EditText
             android:id="@+id/etBkashNumber"
             android:layout_width="match_parent"
@@ -50,8 +50,36 @@
             android:inputType="phone"
             android:padding="12dp"
             android:hint="01XXXXXXXXX"
-            android:layout_marginBottom="15dp"
+            android:layout_marginBottom="12dp"
             android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="রকেট নম্বর (ঐচ্ছিক - খালি রাখলে ওপরের নম্বর চলবে):"/>
+        <EditText
+            android:id="@+id/etRocketNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:inputType="phone"
+            android:maxLength="12"
+            android:padding="12dp"
+            android:hint="01XXXXXXXXXX (১১ বা ১২ ডিজিট)"
+            android:layout_marginBottom="12dp"
+            android:textSize="15sp"
+            android:textStyle="bold"/>
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="উপায় নম্বর (ঐচ্ছিক - খালি রাখলে ওপরের নম্বর চলবে):"/>
+        <EditText
+            android:id="@+id/etUpayNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:inputType="phone"
+            android:maxLength="11"
+            android:padding="12dp"
+            android:hint="01XXXXXXXXX"
+            android:layout_marginBottom="15dp"
+            android:textSize="15sp"
             android:textStyle="bold"/>
 
         <LinearLayout
@@ -93,6 +121,32 @@
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:textColor="#F37023"
+                android:paddingBottom="8dp"/>
+
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEEEEE" android:layout_marginBottom="8dp"/>
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchRocket"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🚀 Rocket (রকেট চ্যানেল)"
+                android:checked="false"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#8C3494"
+                android:paddingBottom="8dp"/>
+
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEEEEE" android:layout_marginBottom="8dp"/>
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchUpay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🔵 Upay (উপায় চ্যানেল)"
+                android:checked="false"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#005BAA"
                 android:paddingBottom="8dp"/>
 
             <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEEEEE" android:layout_marginBottom="8dp"/>
